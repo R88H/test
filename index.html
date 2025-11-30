@@ -37,6 +37,43 @@
       letter-spacing: 0.02em;
     }
 
+    header p {
+      margin: 0.35rem 0 0;
+      opacity: 0.9;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: white;
+      color: var(--green-500);
+      border: none;
+      border-radius: 999px;
+      padding: 0.65rem 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.08s ease;
+    }
+
+    .nav-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .nav-button:active {
+      transform: translateY(0);
+      opacity: 0.92;
+    }
+
     main {
       max-width: 1100px;
       margin: 1.5rem auto;
@@ -179,6 +216,10 @@
   <header>
     <h1>Besputingsregister</h1>
     <p>Leg vast welke middelen op welke percelen zijn gebruikt en bewaar ze lokaal.</p>
+    <div class="nav-buttons" aria-label="Snelle navigatie">
+      <button class="nav-button" type="button" data-target="inventory-section">Voorraadadministratie</button>
+      <button class="nav-button" type="button" data-target="notes-section">Snelle notities</button>
+    </div>
   </header>
 
   <main>
@@ -245,15 +286,71 @@
         </table>
       </div>
     </section>
+
+    <section class="card" id="inventory-section" aria-labelledby="inventory-title">
+      <h2 id="inventory-title">Voorraadadministratie</h2>
+      <p>Houd bij welke middelen nog op voorraad zijn en hoeveel er beschikbaar is.</p>
+      <form id="inventory-form" style="margin-bottom: 1rem;">
+        <div>
+          <label for="inventory-name">Middel</label>
+          <input id="inventory-name" name="name" type="text" placeholder="bijv. Middel X" required />
+        </div>
+        <div>
+          <label for="inventory-amount">Hoeveelheid</label>
+          <input id="inventory-amount" name="amount" type="number" min="0" step="0.1" placeholder="bijv. 25" required />
+        </div>
+        <div>
+          <label for="inventory-unit">Eenheid</label>
+          <input id="inventory-unit" name="unit" type="text" placeholder="L, kg, flacons" required />
+        </div>
+        <button type="submit">Opslaan</button>
+      </form>
+
+      <div style="overflow-x: auto;">
+        <table aria-describedby="inventory-title">
+          <thead>
+            <tr>
+              <th>Middel</th>
+              <th>Hoeveelheid</th>
+              <th>Acties</th>
+            </tr>
+          </thead>
+          <tbody id="inventory-body">
+            <tr class="empty"><td colspan="3">Nog geen voorraaditems.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" id="notes-section" aria-labelledby="notes-title">
+      <h2 id="notes-title">Korte notities</h2>
+      <p>Schrijf snelle aantekeningen over werkomstandigheden, bestellingen of ideeën.</p>
+      <label for="quick-notes">Notitie</label>
+      <textarea id="quick-notes" placeholder="Voeg een korte notitie toe..." rows="5"></textarea>
+      <div class="actions" style="margin-top: 0.75rem; justify-content: flex-end;">
+        <button class="ghost-button" id="clear-notes" type="button">Notitie wissen</button>
+        <button type="button" id="save-notes">Opslaan</button>
+      </div>
+      <p id="notes-feedback" style="color: var(--gray-600); margin-top: 0.5rem;"></p>
+    </section>
   </main>
 
   <script>
     const STORAGE_KEY = "spray-records";
+    const INVENTORY_KEY = "inventory-items";
+    const NOTES_KEY = "quick-notes";
     const form = document.getElementById("spray-form");
     const recordsBody = document.getElementById("records-body");
     const dateInput = document.getElementById("date");
     const clearButton = document.getElementById("clear-button");
     const exportButton = document.getElementById("export-button");
+    const inventoryForm = document.getElementById("inventory-form");
+    const inventoryBody = document.getElementById("inventory-body");
+    const notesField = document.getElementById("quick-notes");
+    const saveNotesButton = document.getElementById("save-notes");
+    const clearNotesButton = document.getElementById("clear-notes");
+    const notesFeedback = document.getElementById("notes-feedback");
+    const navButtons = document.querySelectorAll(".nav-button");
 
     const loadRecords = () => {
       try {
@@ -269,8 +366,37 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
     };
 
+    const loadInventory = () => {
+      try {
+        const raw = localStorage.getItem(INVENTORY_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (error) {
+        console.error("Kan voorraad niet laden:", error);
+        return [];
+      }
+    };
+
+    const saveInventory = (items) => {
+      localStorage.setItem(INVENTORY_KEY, JSON.stringify(items));
+    };
+
+    const loadNotes = () => {
+      try {
+        return localStorage.getItem(NOTES_KEY) || "";
+      } catch (error) {
+        console.error("Kan notities niet laden:", error);
+        return "";
+      }
+    };
+
+    const saveNotes = (text) => {
+      localStorage.setItem(NOTES_KEY, text);
+    };
+
     const state = {
       records: loadRecords(),
+      inventory: loadInventory(),
+      notes: loadNotes(),
     };
 
     const setToday = () => {
@@ -341,10 +467,54 @@
       });
     };
 
+    const renderInventory = () => {
+      inventoryBody.innerHTML = "";
+
+      if (!state.inventory.length) {
+        const row = document.createElement("tr");
+        row.className = "empty";
+        const cell = document.createElement("td");
+        cell.colSpan = 3;
+        cell.textContent = "Nog geen voorraaditems.";
+        row.appendChild(cell);
+        inventoryBody.appendChild(row);
+        return;
+      }
+
+      state.inventory.forEach((item, index) => {
+        const row = document.createElement("tr");
+
+        const nameCell = document.createElement("td");
+        nameCell.appendChild(createTag(item.name));
+        row.appendChild(nameCell);
+
+        const amountCell = document.createElement("td");
+        amountCell.textContent = `${item.amount} ${item.unit}`;
+        row.appendChild(amountCell);
+
+        const actionsCell = document.createElement("td");
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.textContent = "Verwijderen";
+        deleteButton.className = "ghost-button";
+        deleteButton.addEventListener("click", () => deleteInventoryItem(index));
+        actionsCell.appendChild(deleteButton);
+        row.appendChild(actionsCell);
+
+        inventoryBody.appendChild(row);
+      });
+    };
+
     const deleteRecord = (index) => {
       state.records.splice(index, 1);
       saveRecords(state.records);
       renderRecords();
+    };
+
+    const deleteInventoryItem = (index) => {
+      state.inventory.splice(index, 1);
+      saveInventory(state.inventory);
+      renderInventory();
     };
 
     const downloadCsv = () => {
@@ -403,8 +573,59 @@
 
     exportButton.addEventListener("click", downloadCsv);
 
+    inventoryForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const formData = new FormData(inventoryForm);
+      const item = {
+        name: formData.get("name").trim(),
+        amount: Number(formData.get("amount")),
+        unit: formData.get("unit").trim(),
+      };
+
+      if (!item.name || !item.unit) return;
+
+      state.inventory.unshift(item);
+      saveInventory(state.inventory);
+      renderInventory();
+      inventoryForm.reset();
+    });
+
+    const renderNotes = () => {
+      notesField.value = state.notes;
+    };
+
+    const showNotesFeedback = (message) => {
+      notesFeedback.textContent = message;
+      setTimeout(() => {
+        notesFeedback.textContent = "";
+      }, 2000);
+    };
+
+    saveNotesButton.addEventListener("click", () => {
+      state.notes = notesField.value.trim();
+      saveNotes(state.notes);
+      showNotesFeedback("Opgeslagen");
+    });
+
+    clearNotesButton.addEventListener("click", () => {
+      state.notes = "";
+      notesField.value = "";
+      saveNotes(state.notes);
+      showNotesFeedback("Notitie gewist");
+    });
+
+    navButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const targetId = button.getAttribute("data-target");
+        const target = document.getElementById(targetId);
+        target?.scrollIntoView({ behavior: "smooth" });
+      });
+    });
+
     setToday();
     renderRecords();
+    renderInventory();
+    renderNotes();
   </script>
 </body>
 </html>
