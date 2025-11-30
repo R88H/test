@@ -1,27 +1,26 @@
+const API_BASE = "/api/records";
+
+const formatRequestError = async (response) => {
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    const payload = await response.json();
+    if (payload && payload.detail) {
+      return payload.detail;
+    }
+  }
+  return `Serverfout (${response.status})`;
+};
+
 document.addEventListener("DOMContentLoaded", () => {
-  const STORAGE_KEY = "spray-records";
   const form = document.getElementById("spray-form");
   const recordsBody = document.getElementById("records-body");
   const dateInput = document.getElementById("date");
   const clearButton = document.getElementById("clear-button");
   const exportButton = document.getElementById("export-button");
 
-  const loadRecords = () => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch (error) {
-      console.error("Kan gegevens niet laden:", error);
-      return [];
-    }
-  };
-
-  const saveRecords = (records) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-  };
-
   const state = {
-    records: loadRecords(),
+    records: [],
+    loading: false,
   };
 
   const setToday = () => {
@@ -42,21 +41,31 @@ document.addEventListener("DOMContentLoaded", () => {
     return span;
   };
 
+  const renderMessageRow = (message) => {
+    recordsBody.innerHTML = "";
+    const row = document.createElement("tr");
+    row.className = "empty";
+    const cell = document.createElement("td");
+    cell.colSpan = 6;
+    cell.textContent = message;
+    row.appendChild(cell);
+    recordsBody.appendChild(row);
+  };
+
   const renderRecords = () => {
     recordsBody.innerHTML = "";
 
-    if (!state.records.length) {
-      const row = document.createElement("tr");
-      row.className = "empty";
-      const cell = document.createElement("td");
-      cell.colSpan = 6;
-      cell.textContent = "Nog geen registraties.";
-      row.appendChild(cell);
-      recordsBody.appendChild(row);
+    if (state.loading) {
+      renderMessageRow("Data wordt geladen...");
       return;
     }
 
-    state.records.forEach((record, index) => {
+    if (!state.records.length) {
+      renderMessageRow("Nog geen registraties.");
+      return;
+    }
+
+    state.records.forEach((record) => {
       const row = document.createElement("tr");
 
       const dateCell = document.createElement("td");
@@ -84,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
       deleteButton.type = "button";
       deleteButton.textContent = "Verwijderen";
       deleteButton.className = "ghost-button";
-      deleteButton.addEventListener("click", () => deleteRecord(index));
+      deleteButton.addEventListener("click", () => deleteRecord(record.id));
       actionsCell.appendChild(deleteButton);
       row.appendChild(actionsCell);
 
@@ -92,10 +101,67 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  const deleteRecord = (index) => {
-    state.records.splice(index, 1);
-    saveRecords(state.records);
+  const loadRecords = async () => {
+    state.loading = true;
     renderRecords();
+    try {
+      const response = await fetch(API_BASE);
+      if (!response.ok) {
+        throw new Error(await formatRequestError(response));
+      }
+      const data = await response.json();
+      state.records = data;
+    } catch (error) {
+      console.error("Kan gegevens niet laden:", error);
+      renderMessageRow(`Kan gegevens niet laden: ${error.message}`);
+      return;
+    } finally {
+      state.loading = false;
+    }
+    renderRecords();
+  };
+
+  const createRecord = async (record) => {
+    const response = await fetch(API_BASE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(record),
+    });
+    if (!response.ok) {
+      throw new Error(await formatRequestError(response));
+    }
+    return response.json();
+  };
+
+  const deleteRecord = async (id) => {
+    try {
+      const response = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
+      if (!response.ok) {
+        throw new Error(await formatRequestError(response));
+      }
+      state.records = state.records.filter((record) => record.id !== id);
+      renderRecords();
+    } catch (error) {
+      alert(`Verwijderen mislukt: ${error.message}`);
+    }
+  };
+
+  const deleteAllRecords = async () => {
+    if (state.records.length === 0) return;
+    const confirmed = confirm("Weet je zeker dat je alle registraties wilt wissen?");
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(API_BASE, { method: "DELETE" });
+      if (!response.ok) {
+        throw new Error(await formatRequestError(response));
+      }
+      state.records = [];
+      renderRecords();
+      resetForm();
+    } catch (error) {
+      alert(`Wissen mislukt: ${error.message}`);
+    }
   };
 
   const downloadCsv = () => {
@@ -125,35 +191,33 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   };
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const formData = new FormData(form);
     const record = {
       date: formData.get("date"),
       field: formData.get("field"),
       product: formData.get("product"),
-      dose: Number(formData.get("dose")),
+      dose: Number.parseFloat(formData.get("dose")),
       notes: formData.get("notes").trim(),
     };
 
-    state.records.unshift(record);
-    saveRecords(state.records);
-    renderRecords();
-    resetForm();
+    try {
+      const created = await createRecord(record);
+      state.records.unshift(created);
+      renderRecords();
+      resetForm();
+    } catch (error) {
+      alert(`Opslaan mislukt: ${error.message}`);
+    }
   });
 
   clearButton.addEventListener("click", () => {
-    if (state.records.length === 0) return;
-    const confirmed = confirm("Weet je zeker dat je alle registraties wilt wissen?");
-    if (!confirmed) return;
-    state.records = [];
-    saveRecords(state.records);
-    renderRecords();
-    resetForm();
+    deleteAllRecords();
   });
 
   exportButton.addEventListener("click", downloadCsv);
 
   setToday();
-  renderRecords();
+  loadRecords();
 });
