@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bespuitschema</title>
+  <style>
+    :root {
+      --green-500: #0f7b2a;
+      --green-100: #e7f5ec;
+      --gray-100: #f6f7fb;
+      --gray-300: #d7d8de;
+      --gray-600: #565867;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--gray-100);
+      color: #1f2430;
+    }
+
+    header {
+      background: var(--green-500);
+      color: white;
+      padding: 1.5rem;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      letter-spacing: 0.02em;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 1.5rem auto;
+      padding: 0 1rem 2rem;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--gray-300);
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      color: var(--gray-600);
+      letter-spacing: 0.01em;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px;
+      border: 1px solid var(--gray-300);
+      background: #fff;
+      font-size: 1rem;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 42px;
+      max-height: 140px;
+    }
+
+    button[type="submit"] {
+      background: var(--green-500);
+      color: white;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(15, 123, 42, 0.25);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.08s ease;
+    }
+
+    button[type="submit"]:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(15, 123, 42, 0.25);
+    }
+
+    button[type="submit"]:active {
+      transform: translateY(0);
+      opacity: 0.92;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 0.75rem 0.6rem;
+      border-bottom: 1px solid var(--gray-300);
+      text-align: left;
+    }
+
+    th {
+      color: var(--gray-600);
+      font-size: 0.95rem;
+      letter-spacing: 0.01em;
+    }
+
+    tbody tr:hover {
+      background: var(--green-100);
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--gray-600);
+      padding: 1.25rem 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.3rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      background: var(--green-100);
+      color: var(--green-500);
+      border: 1px solid rgba(15, 123, 42, 0.2);
+      gap: 0.35rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .ghost-button {
+      background: white;
+      border: 1px solid var(--gray-300);
+      color: var(--gray-600);
+      cursor: pointer;
+      width: auto;
+      padding: 0.55rem 0.75rem;
+      transition: background 0.08s ease;
+    }
+
+    .ghost-button:hover {
+      background: var(--gray-100);
+    }
+
+    @media (max-width: 720px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Besputingsregister</h1>
+    <p>Leg vast welke middelen op welke percelen zijn gebruikt en bewaar ze lokaal.</p>
+  </header>
+
+  <main>
+    <section class="card" aria-labelledby="form-title">
+      <h2 id="form-title">Nieuwe bespuiting</h2>
+      <form id="spray-form">
+        <div>
+          <label for="date">Datum</label>
+          <input id="date" name="date" type="date" required />
+        </div>
+        <div>
+          <label for="field">Perceel</label>
+          <select id="field" name="field" required>
+            <option value="">Kies perceel</option>
+            <option value="Perceel A">Perceel A</option>
+            <option value="Perceel B">Perceel B</option>
+            <option value="Perceel C">Perceel C</option>
+          </select>
+        </div>
+        <div>
+          <label for="product">Middel</label>
+          <select id="product" name="product" required>
+            <option value="">Kies middel</option>
+            <option value="Middel A">Middel A</option>
+            <option value="Middel B">Middel B</option>
+            <option value="Middel C">Middel C</option>
+          </select>
+        </div>
+        <div>
+          <label for="dose">Dosering (L/ha)</label>
+          <input id="dose" name="dose" type="number" min="0" step="0.1" placeholder="bijv. 1.5" required />
+        </div>
+        <div>
+          <label for="notes">Opmerkingen</label>
+          <textarea id="notes" name="notes" placeholder="Weersomstandigheden, toevoegingen, etc."></textarea>
+        </div>
+        <button type="submit">Opslaan</button>
+      </form>
+    </section>
+
+    <section class="card" aria-labelledby="list-title">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+        <h2 id="list-title" style="margin: 0;">Registraties</h2>
+        <div class="actions">
+          <button class="ghost-button" id="export-button" type="button">Exporteren (CSV)</button>
+          <button class="ghost-button" id="clear-button" type="button">Alles wissen</button>
+        </div>
+      </div>
+      <div style="overflow-x: auto;">
+        <table aria-describedby="list-title">
+          <thead>
+            <tr>
+              <th>Datum</th>
+              <th>Perceel</th>
+              <th>Middel</th>
+              <th>Dosering</th>
+              <th>Opmerkingen</th>
+              <th>Acties</th>
+            </tr>
+          </thead>
+          <tbody id="records-body">
+            <tr class="empty"><td colspan="6">Nog geen registraties.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "spray-records";
+    const form = document.getElementById("spray-form");
+    const recordsBody = document.getElementById("records-body");
+    const dateInput = document.getElementById("date");
+    const clearButton = document.getElementById("clear-button");
+    const exportButton = document.getElementById("export-button");
+
+    const loadRecords = () => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (error) {
+        console.error("Kan gegevens niet laden:", error);
+        return [];
+      }
+    };
+
+    const saveRecords = (records) => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    };
+
+    const state = {
+      records: loadRecords(),
+    };
+
+    const setToday = () => {
+      const today = new Date();
+      const formatted = today.toISOString().slice(0, 10);
+      dateInput.value = formatted;
+    };
+
+    const resetForm = () => {
+      form.reset();
+      setToday();
+    };
+
+    const createTag = (label) => {
+      const span = document.createElement("span");
+      span.className = "tag";
+      span.textContent = label;
+      return span;
+    };
+
+    const renderRecords = () => {
+      recordsBody.innerHTML = "";
+
+      if (!state.records.length) {
+        const row = document.createElement("tr");
+        row.className = "empty";
+        const cell = document.createElement("td");
+        cell.colSpan = 6;
+        cell.textContent = "Nog geen registraties.";
+        row.appendChild(cell);
+        recordsBody.appendChild(row);
+        return;
+      }
+
+      state.records.forEach((record, index) => {
+        const row = document.createElement("tr");
+
+        const dateCell = document.createElement("td");
+        dateCell.textContent = record.date;
+        row.appendChild(dateCell);
+
+        const fieldCell = document.createElement("td");
+        fieldCell.appendChild(createTag(record.field));
+        row.appendChild(fieldCell);
+
+        const productCell = document.createElement("td");
+        productCell.appendChild(createTag(record.product));
+        row.appendChild(productCell);
+
+        const doseCell = document.createElement("td");
+        doseCell.textContent = `${record.dose} L/ha`;
+        row.appendChild(doseCell);
+
+        const notesCell = document.createElement("td");
+        notesCell.textContent = record.notes || "-";
+        row.appendChild(notesCell);
+
+        const actionsCell = document.createElement("td");
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.textContent = "Verwijderen";
+        deleteButton.className = "ghost-button";
+        deleteButton.addEventListener("click", () => deleteRecord(index));
+        actionsCell.appendChild(deleteButton);
+        row.appendChild(actionsCell);
+
+        recordsBody.appendChild(row);
+      });
+    };
+
+    const deleteRecord = (index) => {
+      state.records.splice(index, 1);
+      saveRecords(state.records);
+      renderRecords();
+    };
+
+    const downloadCsv = () => {
+      if (!state.records.length) {
+        alert("Geen data om te exporteren.");
+        return;
+      }
+
+      const header = ["Datum", "Perceel", "Middel", "Dosering (L/ha)", "Opmerkingen"];
+      const rows = state.records.map((record) => [
+        record.date,
+        record.field,
+        record.product,
+        record.dose,
+        record.notes?.replace(/\n/g, " ") || "",
+      ]);
+      const csv = [header, ...rows]
+        .map((line) => line.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "bespuitingen.csv";
+      link.click();
+      URL.revokeObjectURL(url);
+    };
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const record = {
+        date: formData.get("date"),
+        field: formData.get("field"),
+        product: formData.get("product"),
+        dose: Number(formData.get("dose")),
+        notes: formData.get("notes").trim(),
+      };
+
+      state.records.unshift(record);
+      saveRecords(state.records);
+      renderRecords();
+      resetForm();
+    });
+
+    clearButton.addEventListener("click", () => {
+      if (state.records.length === 0) return;
+      const confirmed = confirm("Weet je zeker dat je alle registraties wilt wissen?");
+      if (!confirmed) return;
+      state.records = [];
+      saveRecords(state.records);
+      renderRecords();
+      resetForm();
+    });
+
+    exportButton.addEventListener("click", downloadCsv);
+
+    setToday();
+    renderRecords();
+  </script>
+</body>
+</html>
