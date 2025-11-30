@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Besputingsregister</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <nav><a href="index.html">← Terug naar start</a></nav>
+      <h1>Besputingsregister</h1>
+      <p>Leg vast welke middelen op welke percelen zijn gebruikt en bewaar ze lokaal.</p>
+    </header>
+
+    <main>
+      <section class="card" aria-labelledby="form-title">
+        <h2 id="form-title">Nieuwe bespuiting</h2>
+        <form id="spray-form">
+          <div>
+            <label for="date">Datum</label>
+            <input id="date" name="date" type="date" required />
+          </div>
+          <div>
+            <label for="field">Perceel</label>
+            <select id="field" name="field" required>
+              <option value="">Kies perceel</option>
+              <option value="Perceel A">Perceel A</option>
+              <option value="Perceel B">Perceel B</option>
+              <option value="Perceel C">Perceel C</option>
+            </select>
+          </div>
+          <div>
+            <label for="product">Middel</label>
+            <select id="product" name="product" required>
+              <option value="">Kies middel</option>
+              <option value="Middel A">Middel A</option>
+              <option value="Middel B">Middel B</option>
+              <option value="Middel C">Middel C</option>
+            </select>
+          </div>
+          <div>
+            <label for="dose">Dosering (L/ha)</label>
+            <input id="dose" name="dose" type="number" min="0" step="0.1" placeholder="bijv. 1.5" required />
+          </div>
+          <div>
+            <label for="notes">Opmerkingen</label>
+            <textarea id="notes" name="notes" placeholder="Weersomstandigheden, toevoegingen, etc."></textarea>
+          </div>
+          <button type="submit">Opslaan</button>
+        </form>
+      </section>
+
+      <section class="card" aria-labelledby="list-title" id="lijst">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+          <h2 id="list-title" style="margin: 0;">Registraties</h2>
+          <div class="actions">
+            <button class="ghost-button" id="export-button" type="button">Exporteren (CSV)</button>
+            <button class="ghost-button" id="clear-button" type="button">Alles wissen</button>
+          </div>
+        </div>
+        <div style="overflow-x: auto;">
+          <table aria-describedby="list-title">
+            <thead>
+              <tr>
+                <th>Datum</th>
+                <th>Perceel</th>
+                <th>Middel</th>
+                <th>Dosering</th>
+                <th>Opmerkingen</th>
+                <th>Acties</th>
+              </tr>
+            </thead>
+            <tbody id="records-body">
+              <tr class="empty"><td colspan="6">Nog geen registraties.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
