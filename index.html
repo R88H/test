@@ -3,35 +3,106 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Besputingsregister</title>
+    <title>Bitcoin in een oogopslag</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header>
-      <h1>Bespuitingen vastleggen</h1>
-      <p>Bewaar per perceel welke middelen gebruikt zijn. Start hier en ga naar het registratiescherm.</p>
+    <header class="site-header">
+      <nav class="nav">
+        <span class="logo">₿ Bitcoin</span>
+        <div class="nav-links">
+          <a href="#waarom">Waarom Bitcoin?</a>
+          <a href="#hoe">Hoe het werkt</a>
+          <a href="#start">Aan de slag</a>
+        </div>
+      </nav>
+      <div class="hero">
+        <div>
+          <p class="tagline">Digitaal geld zonder grenzen</p>
+          <h1>Ontdek de waarde van Bitcoin</h1>
+          <p>
+            Bitcoin is een open, wereldwijd netwerk voor waarde-uitwisseling. Het werkt 24/7, is transparant en
+            ontworpen om schaars te zijn. Op deze pagina krijg je een heldere introductie.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-btn" href="#start">Begin vandaag</a>
+            <a class="ghost-button" href="#waarom">Lees meer</a>
+          </div>
+        </div>
+        <div class="card hero-card">
+          <h2>Feiten in het kort</h2>
+          <ul class="bullet-list">
+            <li>Maximaal 21 miljoen munten beschikbaar.</li>
+            <li>Transacties worden geverifieerd door een wereldwijd netwerk.</li>
+            <li>Open-source en voor iedereen toegankelijk.</li>
+            <li>Programmatisch schaarste met een halvering elke ~4 jaar.</li>
+          </ul>
+        </div>
+      </div>
     </header>
 
     <main>
-      <section class="card hero">
-        <div>
-          <h2 style="margin-top: 0;">Snel aan de slag</h2>
-          <p>Registreer bespuitingen op percelen A/B/C met middelen A/B/C en bewaar ze lokaal in je browser. Je kunt alles later exporteren naar CSV.</p>
-          <div class="hero-actions">
-            <a class="primary-btn" href="register.html">Naar registraties →</a>
-            <a class="ghost-button" href="register.html#lijst">Bekijk huidige data</a>
+      <section id="waarom" class="card section">
+        <h2>Waarom mensen Bitcoin gebruiken</h2>
+        <div class="feature-grid">
+          <div class="feature">
+            <h3>Schaarste</h3>
+            <p>De vaste limiet van 21 miljoen creëert voorspelbaarheid in aanbod, vergelijkbaar met digitaal goud.</p>
+          </div>
+          <div class="feature">
+            <h3>Toegankelijkheid</h3>
+            <p>Iedereen met internettoegang kan een wallet aanmaken en waarde verzenden of ontvangen.</p>
+          </div>
+          <div class="feature">
+            <h3>Transparantie</h3>
+            <p>Het netwerk is openbaar, zodat transacties verifieerbaar zijn zonder centrale partij.</p>
           </div>
         </div>
-        <div class="card" style="margin: 0; background: var(--green-100); border-color: rgba(15, 123, 42, 0.25);">
-          <h3 style="margin-top: 0;">Wat kun je doen?</h3>
-          <ul>
-            <li>Perceel en middel selecteren</li>
-            <li>Dosering en opmerkingen toevoegen</li>
-            <li>Registraties verwijderen of alles wissen</li>
-            <li>CSV-export maken voor rapportages</li>
-          </ul>
+      </section>
+
+      <section id="hoe" class="card section">
+        <h2>Hoe het werkt</h2>
+        <div class="steps">
+          <div class="step-card">
+            <span class="step-number">1</span>
+            <div>
+              <h3>Wallet instellen</h3>
+              <p>Een wallet bewaart je private keys en zorgt dat je BTC kunt verzenden en ontvangen.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <span class="step-number">2</span>
+            <div>
+              <h3>Transacties</h3>
+              <p>Transacties worden gebundeld in blokken en wereldwijd geverifieerd door miners.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <span class="step-number">3</span>
+            <div>
+              <h3>Beveiliging</h3>
+              <p>Proof-of-work en cryptografie zorgen voor betrouwbaarheid en weerstand tegen censuur.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="start" class="card section callout">
+        <div>
+          <h2>Start veilig</h2>
+          <p>
+            Leer de basis, kies een betrouwbare wallet en begin klein. Beveilig je herstelzin en wees alert op scams.
+          </p>
+        </div>
+        <div class="callout-actions">
+          <span class="badge">Tip</span>
+          <p>Gebruik altijd tweefactorauthenticatie en controleer transacties zorgvuldig.</p>
         </div>
       </section>
     </main>
+
+    <footer class="site-footer">
+      <p>Bitcoin is experimenteel en waarde kan fluctueren. Dit is geen financieel advies.</p>
+    </footer>
   </body>
 </html>
